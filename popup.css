@@ -1,0 +1,111 @@
+body {
+    margin: 0;
+    font-family:
+        Segoe UI,
+        Arial,
+        sans-serif;
+    background: #f0fdf4;
+    width: 320px;
+}
+
+.container {
+    padding: 12px;
+}
+
+/* Gradient Header */
+
+.header {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+/* Cards */
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.current-site {
+    font-size: 15px;
+    font-weight: 500;
+    color: #065f46;
+    word-break: break-all;
+}
+
+/* Whitelist container */
+
+.whitelist-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+/* Individual site item */
+
+.site {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ecfdf5;
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.domain {
+    font-size: 13px;
+    color: #065f46;
+}
+
+/* Remove button */
+
+.remove-btn {
+    border: none;
+    background: #ef4444;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.remove-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.remove-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Footer */
+
+.footer {
+    text-align: center;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 6px;
+}
