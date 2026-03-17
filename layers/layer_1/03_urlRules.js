@@ -11,45 +11,28 @@ We detect:
 - very long URLs
 - '@' redirection trick
 */
-
 import suspiciousKeywords from "../../config/suspiciousKeywords.js";
 
 export function checkUrlRules(url) {
 
-    let suspicious = false;
+    const lower = url.toLowerCase();
 
-    const lowerUrl = url.toLowerCase();
-
-    /* Suspicious Keywords */
-
-    for (const keyword of suspiciousKeywords) {
-
-        if (lowerUrl.includes(keyword)) {
-            suspicious = true;
-            break;
-        }
-
-    }
-
-    /*
-    contains '@':
-    
-    Example:
-    http://paypal.com@attacker.ru
-
-    Browser actually opens:
-    attacker.ru
-    */
+    // strong signal → block
     if (url.includes("@")) {
         return { block: true };
     }
 
-
-    /* Long URLs often hide phishing content */
-    if (url.length > 150) {
-        suspicious = true;
+    // count keyword matches (cheap + fast)
+    let matches = 0;
+    for (const k of suspiciousKeywords) {
+        if (lower.includes(k)) matches++;
+        if (matches >= 2) return { suspicious: true }; // early exit
     }
 
-    return { suspicious };
-}
+    //  mild signals
+    if (url.length > 300 || (url.match(/&/g)?.length || 0) > 5) {
+        return { suspicious: true };
+    }
 
+    return {};
+}
