@@ -31,3 +31,4 @@ const suspiciousKeywords=[
     "bonus",
     "reward"
 ];
+export default suspiciousKeywords;
