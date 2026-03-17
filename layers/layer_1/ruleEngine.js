@@ -13,7 +13,6 @@ SAFE
 PHISHING
 SUSPICIOUS
 */
-
 import { isWhitelisted } from "./01_whitelist.js";
 import { isBlacklisted } from "./02_blacklist.js";
 import { checkUrlRules } from "./03_urlRules.js";
@@ -21,61 +20,30 @@ import { checkDomainRules } from "./04_domainRules.js";
 
 export async function runRuleEngine(url, domain) {
 
-    /*
-    STEP 1: Whitelist Check
-
-    If domain is trusted, allow immediately.
-    */
+    // 1. Whitelist → allow immediately
     if (await isWhitelisted(domain)) {
-
         return { status: "safe" };
-
     }
 
-    /*
-    STEP 2: Blacklist Check
-
-    If domain is known phishing, block immediately.
-    */
-    if (await isBlacklisted(domain)) {
-
+    // 2. Blacklist → block immediately
+    if (await isBlacklisted(domain, url)) {
         return { status: "phishing" };
-
     }
 
-
-    /*
-    STEP 3: URL Analysis
-    */
-    const urlResult = checkUrlRules(url);
-
-    /*
-    STEP 4: Domain Analysis
-    */
-
-    const domainResult = checkDomainRules(domain);
-
-    /*
-    If any rule strongly indicates phishing
-    */
-
-    if (urlResult.block || domainResult.block) {
-
+    // 3. URL rules (fast check)
+    const urlRes = checkUrlRules(url);
+    if (urlRes.block) {
         return { status: "phishing" };
-
     }
 
-    /*
-    If rules detect suspicious patterns
-    */
+    // 4. Domain rules (fast check)
+    const domainRes = checkDomainRules(domain);
 
-    if (urlResult.suspicious || domainResult.suspicious) {
-
+    // 5. Only mark suspicious (no heavy merging)
+    if (urlRes.suspicious || domainRes.suspicious) {
         return { status: "suspicious" };
-
     }
 
-    
-    //Otherwise treat as safe
+    // default
     return { status: "safe" };
 }
