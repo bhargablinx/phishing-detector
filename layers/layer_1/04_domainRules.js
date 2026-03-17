@@ -10,44 +10,23 @@ Checks include:
 - too many subdomains
 - IP address domains
 */
-
 import badTlds from "../../config/badTlds.js";
 
 export function checkDomainRules(domain) {
 
-    let suspicious = false;
-
     const parts = domain.split(".");
-    const tld = parts[parts.length - 1];
+    const tld = parts.pop();
 
-    // suspicious TLD
-    if (badTlds.includes(tld)) {
-        suspicious = true;
+    //  stronger signals first
+    if (domain.includes("xn--")) return { suspicious: true };
+
+    const isIP = /^\d+\.\d+\.\d+\.\d+$/.test(domain);
+    if (isIP) return { suspicious: true };
+
+    //  weaker signals combined
+    if (badTlds.includes(tld) && parts.length > 2) {
+        return { suspicious: true };
     }
 
-
-    /* Punycode Detection
-    Example:
-    xn--pple-43d.com
-    which visually looks like "apple.com"
-    */
-    if (domain.includes("xn--")) {
-        return { block: true};
-    }
-
-
-    // too many subdomains
-    if (parts.length > 4) {
-        suspicious = true;
-    }
-
-
-    // IP address domain
-    const ipPattern = /^\d+\.\d+\.\d+\.\d+$/;
-
-    if (ipPattern.test(domain)) {
-        suspicious = true;
-    }
-
-    return { suspicious };
+    return {};
 }
