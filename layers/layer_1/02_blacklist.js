@@ -11,7 +11,7 @@ Sources:
 
 This list is stored in chrome.storage so it persists.
 */
-import { getOpenPhishFeed } from "../../services/blacklistFeeds.js";
+import { getAllPhishingFeeds } from "../../services/blacklistFeeds.js";
 
 export async function isBlacklisted(domain, url) {
 
@@ -24,7 +24,7 @@ export async function isBlacklisted(domain, url) {
     }
 
     /* 2. External feed */
-    const feed = await getOpenPhishFeed();
+    const feed = await getAllPhishingFeeds();
 
     // safer match
     const isMatch = feed.some(phishUrl => {

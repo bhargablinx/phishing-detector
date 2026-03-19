@@ -1,19 +1,30 @@
-// services/threatFeeds.js
-
 let cachedFeed = null;
 
-export async function getOpenPhishFeed() {
-    if (cachedFeed) return cachedFeed;
+async function fetchFeed(url) {
+  try {
+    const response = await fetch(url);
+    const text = await response.text();
+    return text.split("\n").filter(Boolean);
+  } catch (error) {
+    console.error(`Error fetching ${url}:`, error);
+    return [];
+  }
+}
 
-    try {
-        const response = await fetch("https://openphish.com/feed.txt");
-        const text = await response.text();
+export async function getAllPhishingFeeds() {
+  if (cachedFeed) return cachedFeed;
 
-        cachedFeed = text.split("\n").filter(Boolean); // array
-        return cachedFeed;
+  const sources = [
+    "https://openphish.com/feed.txt",
+    "https://urlhaus.abuse.ch/downloads/text/",
+    "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-links-ACTIVE.txt",
+  ];
 
-    } catch (error) {
-        console.error("Threat feed error:", error);
-        return [];
-    }
+  const results = await Promise.all(sources.map(fetchFeed));
+
+  let combined = results.flat();
+  combined = [...new Set(combined)];
+
+  cachedFeed = combined;
+  return combined;
 }
