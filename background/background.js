@@ -1,4 +1,5 @@
 import { runRuleEngine } from "../layers/layer_1/ruleEngine.js";  
+import { analyzeWithLLM } from "../layers/layer_2/03_llmAnalyzer.js";
 
 console.log("Phishing detector background running");
 
@@ -72,26 +73,44 @@ chrome.runtime.onMessage.addListener((message, sender) => {
         const domain = getDomain(url);
         if (!domain) return;
 
-        runRuleEngine(url, domain).then(result => {
+        runRuleEngine(url, domain).then(async (result) => {
 
-            if (result.status === "phishing" || result.status === "suspicious") {
+                // Clearly phishing → block immediately
+                if (result.status === "phishing") {
+                    chrome.tabs.update(tabId, {
+                        url:
+                            chrome.runtime.getURL("ui/block.html") +
+                            "?url=" +
+                            encodeURIComponent(url),
+                    });
+                    return;
+                }
 
-                chrome.tabs.update(tabId, {
-                    url:
-                        chrome.runtime.getURL("ui/block.html") +
-                        "?url=" +
-                        encodeURIComponent(url),
-                });
+                // Clearly safe → allow
+                if (result.status === "safe") {
+                    chrome.tabs.update(tabId, {
+                        url: url,
+                    });
+                    return;
+                }
 
-            } else {
+                // Suspicious → send to LLM (Layer 2)
+                const llmResult = await analyzeWithLLM(url);
 
-                chrome.tabs.update(tabId, {
-                    url: url,
-                });
+                if (llmResult.isPhishing && llmResult.confidence > 70) {
+                    chrome.tabs.update(tabId, {
+                        url:
+                            chrome.runtime.getURL("ui/block.html") +
+                            "?url=" +
+                            encodeURIComponent(url),
+                    });
+                } else {
+                    chrome.tabs.update(tabId, {
+                        url: url,
+                    });
+                }
 
-            }
-
-        });
+            });
 
         return;
     }
@@ -123,7 +142,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
             });
         });
     }
-
+ 
     //  Go back
     if (message.action === "goBack") {
         chrome.tabs.remove(tabId);
