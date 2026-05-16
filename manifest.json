@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "Detect phishing websites using URL and blacklist API",
 
-  "permissions": ["tabs", "storage", "webNavigation"],
+  "permissions": ["tabs", "storage", "unlimitedStorage", "webNavigation"],
 
   "host_permissions": [
     "https://openphish.com/*",

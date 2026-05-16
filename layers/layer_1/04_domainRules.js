@@ -17,7 +17,7 @@ export function checkDomainRules(domain) {
     const parts = domain.split(".");
     const tld = parts.pop();
 
-    //  stronger signals first
+
     if (domain.includes("xn--")) return { suspicious: true };
 
     const isIP = /^\d+\.\d+\.\d+\.\d+$/.test(domain);
